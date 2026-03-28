@@ -25,7 +25,6 @@
 
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
 
-        /* 1. Slim Warning Banner (Right to Left) */
         #warningBanner {
             background: rgba(255, 71, 87, 0.9);
             backdrop-filter: blur(12px);
@@ -47,7 +46,6 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 2. Cinematic Hero Section */
         .hero-visual-section {
             height: 40vh;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -59,7 +57,7 @@
         .ai-showcase-window {
             width: 85%; max-width: 450px; height: 150px;
             border-radius: 25px; border: 1px solid var(--primary);
-            background: url('https://img.freepik.com') center/cover;
+            background: rgba(0,0,0,0.5);
             position: relative; display: flex; align-items: center; justify-content: center;
             box-shadow: var(--glow); animation: pulseGlow 4s infinite;
         }
@@ -84,7 +82,6 @@
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
         }
 
-        /* 3. Professional Upload Gateway */
         .upload-area {
             border: 2px dashed var(--primary);
             background: rgba(0, 210, 255, 0.05);
@@ -93,9 +90,8 @@
         }
         input[type="file"] { display: none; }
         .upload-icon { font-size: 50px; display: block; animation: bounce 2s infinite; }
-        .upload-text { font-size: 0.9rem; color: var(--primary); font-weight: bold; margin-top: 10px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .upload-text { font-size: 0.9rem; color: var(--primary); font-weight: bold; margin-top: 10px; display: block; }
 
-        /* 4. Quality Selector */
         .quality-options {
             margin: 20px 0;
             display: flex; justify-content: center; gap: 10px;
@@ -124,6 +120,7 @@
             transition: 0.3s; width: 100%; max-width: 280px;
         }
 
+        /* Essential About Sections */
         .about-section { margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap; }
         .about-box { flex: 1; min-width: 250px; background: var(--glass); padding: 20px; border-radius: 20px; text-align: center; font-size: 0.85rem; }
 
@@ -134,24 +131,22 @@
         }
         .modal-content { background: rgba(10, 25, 50, 0.95); border: 2px solid var(--primary); padding: 30px; border-radius: 30px; width: 85%; max-width: 450px; text-align: center; }
 
-        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.3); } 50% { box-shadow: 0 0 40px rgba(0, 210, 255, 0.6); } }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
         footer { text-align: center; padding: 40px; opacity: 0.6; font-size: 0.8rem; }
         .legal-btn { color: var(--primary); cursor: pointer; margin: 0 10px; text-decoration: underline; font-weight: bold; }
+
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.3); } 50% { box-shadow: 0 0 40px rgba(0, 210, 255, 0.6); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
 
-    <!-- Warning Banner -->
     <div id="warningBanner">
         <div class="close-banner" onclick="exitToLeft()">×</div>
         <span>⚡ ABDO AI Protocol: Please respect intellectual property rights.</span>
     </div>
 
-    <!-- Hero Showcase Section -->
     <section class="hero-visual-section">
         <div class="ai-showcase-window">
             <h2>ABDO AI SYSTEMS</h2>
@@ -185,6 +180,7 @@
             <button id="processBtn" class="btn-neon" onclick="startAIProcessing()" disabled>LAUNCH AI CLOUD ENGINE</button>
         </div>
 
+        <!-- RE-ADDED THE MISSING SECTIONS HERE -->
         <div class="about-section">
             <div class="about-box">
                 <h3 style="color: var(--primary);">🤖 Who We Are</h3>
@@ -197,7 +193,7 @@
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- Re-added Privacy Modal -->
     <div id="privacyModal" class="modal">
         <div class="modal-content">
             <h2 style="color: var(--primary);">Privacy & Safety</h2>
@@ -214,6 +210,7 @@
     </footer>
 
     <script>
+        // Canvas & UI JS
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let points = [];
@@ -232,9 +229,10 @@
         const banner = document.getElementById('warningBanner');
         setTimeout(() => { banner.classList.add('show'); }, 1500);
         function exitToLeft() { banner.classList.remove('show'); banner.classList.add('hide'); }
-        setTimeout(exitToLeft, 40000);
 
         let selectedQuality = "1080p";
+        let currentFileName = "";
+
         function setQuality(q, btn) {
             selectedQuality = q;
             document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
@@ -245,12 +243,10 @@
             const label = document.getElementById('fileName');
             const btn = document.getElementById('processBtn');
             if(input.files && input.files[0]) {
-                label.innerText = "Recognized: " + input.files[0].name;
+                currentFileName = input.files[0].name;
+                label.innerText = "Recognized: " + currentFileName;
                 document.getElementById('statusMsg').innerHTML = "✅ Protocol verified. Ready for processing.";
                 btn.disabled = false;
-                // Reset click event
-                btn.onclick = startAIProcessing;
-                btn.innerText = "LAUNCH AI CLOUD ENGINE";
             }
         }
 
@@ -260,9 +256,6 @@
             const progCont = document.getElementById('progCont');
             const progBar = document.getElementById('progBar');
             const logs = document.getElementById('aiLogs');
-            const fileInput = document.getElementById('videoInput');
-
-            if (!fileInput.files[0]) return;
 
             btn.disabled = true;
             progCont.style.display = "block";
@@ -271,10 +264,9 @@
 
             const steps = [
                 "> Scanning digital video fingerprint...",
-                "> Locating watermark coordinates [X:45, Y:120]",
-                "> Initializing Generative Inpainting for frames...",
-                "> Reconstructing missing pixels behind watermark...",
-                "> Final rendering via ABDO AI Cloud..."
+                "> Connecting to ABDO Python Backend...",
+                "> Reconstructing missing pixels...",
+                "> Final rendering via AI Cloud..."
             ];
 
             let progress = 0;
@@ -283,8 +275,7 @@
             const interval = setInterval(() => {
                 progress += 2;
                 progBar.style.width = progress + "%";
-
-                if (progress % 20 === 0 && stepIdx < steps.length) {
+                if (progress % 25 === 0 && stepIdx < steps.length) {
                     logs.innerHTML += steps[stepIdx] + "<br>";
                     logs.scrollTop = logs.scrollHeight;
                     stepIdx++;
@@ -293,20 +284,14 @@
                 if (progress >= 100) {
                     clearInterval(interval);
                     status.innerHTML = "✅ Processing Task Complete!";
-                    btn.innerText = `Download ${selectedQuality} Clean Video 📥`;
+                    btn.innerText = `Download Clean Video 📥`;
                     btn.disabled = false;
                     btn.style.background = "var(--secondary)";
                     
-                    // تحويل الزر ليكون زر تحميل حقيقي
+                    // FIXED: Download from your API instead of W3Schools
                     btn.onclick = function() {
-                        const fakeDownloadUrl = "https://www.w3schools.com"; // رابط تجريبي للتأكد من عمل الزر
-                        const a = document.createElement('a');
-                        a.href = fakeDownloadUrl;
-                        a.download = `ABDO_AI_${selectedQuality}_Video.mp4`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        alert("The clean video is being downloaded to your device! 🚀");
+                        window.location.href = `/api/download/CLEAN_ABDO_${currentFileName}`;
+                        alert("The clean video is being requested from your AI server! 🚀");
                     };
                 }
             }, 100);
