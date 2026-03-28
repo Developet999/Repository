@@ -57,7 +57,7 @@
         .ai-showcase-window {
             width: 85%; max-width: 450px; height: 150px;
             border-radius: 25px; border: 1px solid var(--primary);
-            background: rgba(0,0,0,0.5);
+            background: url('https://img.freepik.com') center/cover;
             position: relative; display: flex; align-items: center; justify-content: center;
             box-shadow: var(--glow); animation: pulseGlow 4s infinite;
         }
@@ -90,7 +90,7 @@
         }
         input[type="file"] { display: none; }
         .upload-icon { font-size: 50px; display: block; animation: bounce 2s infinite; }
-        .upload-text { font-size: 0.9rem; color: var(--primary); font-weight: bold; margin-top: 10px; display: block; }
+        .upload-text { font-size: 0.9rem; color: var(--primary); font-weight: bold; margin-top: 10px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .quality-options {
             margin: 20px 0;
@@ -120,7 +120,6 @@
             transition: 0.3s; width: 100%; max-width: 280px;
         }
 
-        /* Essential About Sections */
         .about-section { margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap; }
         .about-box { flex: 1; min-width: 250px; background: var(--glass); padding: 20px; border-radius: 20px; text-align: center; font-size: 0.85rem; }
 
@@ -131,22 +130,24 @@
         }
         .modal-content { background: rgba(10, 25, 50, 0.95); border: 2px solid var(--primary); padding: 30px; border-radius: 30px; width: 85%; max-width: 450px; text-align: center; }
 
-        footer { text-align: center; padding: 40px; opacity: 0.6; font-size: 0.8rem; }
-        .legal-btn { color: var(--primary); cursor: pointer; margin: 0 10px; text-decoration: underline; font-weight: bold; }
-
         @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.3); } 50% { box-shadow: 0 0 40px rgba(0, 210, 255, 0.6); } }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        footer { text-align: center; padding: 40px; opacity: 0.6; font-size: 0.8rem; }
+        .legal-btn { color: var(--primary); cursor: pointer; margin: 0 10px; text-decoration: underline; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
 
+    <!-- Warning Banner -->
     <div id="warningBanner">
         <div class="close-banner" onclick="exitToLeft()">×</div>
         <span>⚡ ABDO AI Protocol: Please respect intellectual property rights.</span>
     </div>
 
+    <!-- Hero Showcase Section -->
     <section class="hero-visual-section">
         <div class="ai-showcase-window">
             <h2>ABDO AI SYSTEMS</h2>
@@ -180,7 +181,6 @@
             <button id="processBtn" class="btn-neon" onclick="startAIProcessing()" disabled>LAUNCH AI CLOUD ENGINE</button>
         </div>
 
-        <!-- RE-ADDED THE MISSING SECTIONS HERE -->
         <div class="about-section">
             <div class="about-box">
                 <h3 style="color: var(--primary);">🤖 Who We Are</h3>
@@ -193,7 +193,7 @@
         </div>
     </div>
 
-    <!-- Re-added Privacy Modal -->
+    <!-- Modals -->
     <div id="privacyModal" class="modal">
         <div class="modal-content">
             <h2 style="color: var(--primary);">Privacy & Safety</h2>
@@ -210,7 +210,6 @@
     </footer>
 
     <script>
-        // Canvas & UI JS
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let points = [];
@@ -229,10 +228,9 @@
         const banner = document.getElementById('warningBanner');
         setTimeout(() => { banner.classList.add('show'); }, 1500);
         function exitToLeft() { banner.classList.remove('show'); banner.classList.add('hide'); }
+        setTimeout(exitToLeft, 40000);
 
         let selectedQuality = "1080p";
-        let currentFileName = "";
-
         function setQuality(q, btn) {
             selectedQuality = q;
             document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
@@ -243,10 +241,10 @@
             const label = document.getElementById('fileName');
             const btn = document.getElementById('processBtn');
             if(input.files && input.files[0]) {
-                currentFileName = input.files[0].name;
-                label.innerText = "Recognized: " + currentFileName;
+                label.innerText = "Recognized: " + input.files[0].name;
                 document.getElementById('statusMsg').innerHTML = "✅ Protocol verified. Ready for processing.";
                 btn.disabled = false;
+                btn.innerText = "LAUNCH AI CLOUD ENGINE";
             }
         }
 
@@ -256,45 +254,75 @@
             const progCont = document.getElementById('progCont');
             const progBar = document.getElementById('progBar');
             const logs = document.getElementById('aiLogs');
+            const fileInput = document.getElementById('videoInput');
+
+            if (!fileInput.files[0]) return;
 
             btn.disabled = true;
             progCont.style.display = "block";
             logs.style.display = "block";
             status.innerHTML = `🚀 Initializing ${selectedQuality} Cloud Engine...`;
 
+            const formData = new FormData();
+            formData.append('video', fileInput.files[0]);
+
             const steps = [
                 "> Scanning digital video fingerprint...",
-                "> Connecting to ABDO Python Backend...",
-                "> Reconstructing missing pixels...",
-                "> Final rendering via AI Cloud..."
+                "> Locating watermark coordinates [X:45, Y:120]",
+                "> Initializing Generative Inpainting for frames...",
+                "> Reconstructing missing pixels behind watermark...",
+                "> Final rendering via ABDO AI Cloud..."
             ];
 
             let progress = 0;
             let stepIdx = 0;
 
             const interval = setInterval(() => {
-                progress += 2;
-                progBar.style.width = progress + "%";
-                if (progress % 25 === 0 && stepIdx < steps.length) {
-                    logs.innerHTML += steps[stepIdx] + "<br>";
-                    logs.scrollTop = logs.scrollHeight;
-                    stepIdx++;
+                if (progress < 90) {
+                    progress += 1;
+                    progBar.style.width = progress + "%";
+                    if (progress % 18 === 0 && stepIdx < steps.length) {
+                        logs.innerHTML += steps[stepIdx] + "<br>";
+                        logs.scrollTop = logs.scrollHeight;
+                        stepIdx++;
+                    }
                 }
+            }, 100);
 
-                if (progress >= 100) {
+            try {
+                const response = await fetch('/process_video', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
                     clearInterval(interval);
+                    progBar.style.width = "100%";
                     status.innerHTML = "✅ Processing Task Complete!";
-                    btn.innerText = `Download Clean Video 📥`;
+                    btn.innerText = `Download ${selectedQuality} Clean Video 📥`;
                     btn.disabled = false;
                     btn.style.background = "var(--secondary)";
                     
-                    // FIXED: Download from your API instead of W3Schools
                     btn.onclick = function() {
-                        window.location.href = `/api/download/CLEAN_ABDO_${currentFileName}`;
-                        alert("The clean video is being requested from your AI server! 🚀");
+                        const a = document.createElement('a');
+                        a.href = result.download_url;
+                        a.download = `ABDO_AI_CLEAN.mp4`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        alert("The clean video is being downloaded! 🚀");
                     };
+                } else {
+                    throw new Error(result.error || "Processing failed");
                 }
-            }, 100);
+            } catch (error) {
+                clearInterval(interval);
+                status.innerHTML = "❌ Error: " + error.message;
+                btn.disabled = false;
+                btn.innerText = "RETRY LAUNCH";
+            }
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
